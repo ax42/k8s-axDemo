@@ -1,9 +1,6 @@
-#FROM raspbian/stretch
-#FROM lpenz/raspbian-buster-armhf-minbase
 FROM debian:buster
 
 #RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
-#RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
 #RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
 
 RUN apt-get update && apt-get upgrade -y
