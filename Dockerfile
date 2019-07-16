@@ -7,13 +7,14 @@ FROM debian:buster
 #RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
 
 RUN apt-get update && apt-get upgrade -y
-#RUN apt-get install -y --no-install-recommends \
-RUN apt-get install -y \
+RUN apt-get install -y --no-install-recommends \
+#RUN apt-get install -y \
 #  make \
 #  gcc \
 #  libc++-dev \
   r-cran-shiny \
   r-cran-dplyr \
+  r-cran-httr \
   r-cran-ggplot2
 
 COPY app.R /srv/app.R
