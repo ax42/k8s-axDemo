@@ -20,15 +20,17 @@ ui <- fluidPage(
                    ),
                    tabPanel("API",
                         checkboxInput("useAPI", label = "Use API", value = FALSE),
-                        # textInput("apiURL", "API endpoint", "http://localhost:7780/"),
-                        textInput("apiURL", "API endpoint", "http://walker:8001/"),
+                        textInput("apiURL", "API endpoint", "http://localhost:8001/"),
+                        # textInput("apiURL", "API endpoint", "http://walker:8001/"),
                         textOutput("apiNodename")
+                        # textOutput("apiSum")
                    )
                )
         ),
         column(9,
                plotOutput("dotPlot"),
-               tableOutput("summaryTable")
+               tableOutput("summaryTable"),
+               tableOutput("summaryTableAPI")
         )
     )
 )
@@ -37,12 +39,47 @@ ui <- fluidPage(
 server <- function(input, output) {
   
     output$summaryTable <- renderTable({
-        
-        srcData() %>% 
+      srcData() %>% 
+        group_by(cat) %>% 
+        summarise(n = n(),
+                  xMean = mean(x), #StdDev = sd(x),
+                  yMean = mean(y), #yStdDev = sd(y)
+                  )
+    })
+   
+    apiPOST <- function(url, body) {
+        resp <- POST(url, body = body, content_type_json(), encode = "json") 
+        print(resp)
+        resp
+    } 
+    
+    apiSum <- function(url, body) {
+      url$path <- "sum"
+      as.numeric(content(apiPOST(build_url(url), body)))
+    }
+    apiCount <- function(url, body) {
+      url$path <- "count"
+      as.numeric(content(apiPOST(build_url(url), body)))
+    }
+    apiMean <- function(url, body) {
+      n <- apiCount(url, body)
+      s <- apiSum(url, body)
+      return(s/n)
+    }
+    output$summaryTableAPI <- renderTable({
+        if (input$useAPI) {
+          url <- parse_url(input$apiURL)
+          body = list(d = srcData()$x)
+          print(apiMean(url, body))
+          # resp <- POST(build_url(url), body = body, encode = "json", content_type_json(), verbose())
+          srcData() %>% 
             group_by(cat) %>% 
-            summarise(n = n(),
-                      xMean = mean(x), xStdDev = sd(x),
-                      yMean = mean(y), yStdDev = sd(y))
+            summarise(n = apiCount(url, list(d = .data$x)),
+                      xMean = apiMean(url, list(d = .data$x)),
+                      yMean = apiMean(url, list(d = .data$y))
+                      )
+            
+        }
         # data.frame(
         #     Item = c('x mean', 'x std dev', 'y mean', 'y std dev'),
         #     Value = c(prettyNum(mean(srcData()$x)),
@@ -53,6 +90,8 @@ server <- function(input, output) {
         # colnames = FALSE, rownames = FALSE,
         # striped = TRUE
     })
+    
+    
      
     output$dotPlot <- renderPlot({
         # print(srcData())
@@ -80,6 +119,16 @@ server <- function(input, output) {
             resp <- GET(build_url(url))
             return(paste("node:", content(resp, "text")))
         } 
+    })
+    
+    output$apiSum <- renderText({
+        if (input$useAPI) {
+          url <- parse_url(input$apiURL)
+          url$path <- "sum"
+          body = list(d = c(1,2,3,4,5))
+          resp <- POST(build_url(url), body = body, encode = "json", content_type_json(), verbose())
+          return(content(resp, "text"))
+        }
     })
 }
 
