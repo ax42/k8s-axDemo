@@ -8,6 +8,8 @@
 #
 
 library(plumber)
+library(ggplot2)
+library(magrittr)
 
 DEBUG <- TRUE
 
@@ -59,6 +61,25 @@ function(req, d) {
     if (DEBUG) print(resp)
     resp
 }
+
+#* Return faceted plot
+#* @png
+#* @post /plot
+function(req, x, y) {
+    # 
+    # d <- data.frame(x = x, y = y)
+    # if (DEBUG) print(paste("ds:",summary(d)))
+    # if (DEBUG) print(x)
+    # if (DEBUG) print(y)
+    # if (DEBUG) print(d)
+    # 
+    # d %>% 
+    #     ggplot(aes(x, y)) + geom_point(alpha = 0.2) +
+    #         # facet_wrap(~cat) +
+    #         theme(legend.position = "none")
+    print(ggplot(data=datasets::women, aes(height)) + geom_histogram())
+}
+
 
 #* Return OK
 #* @get /nodename

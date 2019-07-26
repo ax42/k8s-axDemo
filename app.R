@@ -35,7 +35,7 @@ ui <- fluidPage(
         column(5,
                h3("API"),
                tableOutput("summaryTableAPI"),
-               plotOutput("dotPlotAPI")
+               imageOutput("dotPlotAPI")
         )
     )
 )
@@ -84,24 +84,23 @@ server <- function(input, output) {
                       )
             
         }
-        # data.frame(
-        #     Item = c('x mean', 'x std dev', 'y mean', 'y std dev'),
-        #     Value = c(prettyNum(mean(srcData()$x)),
-        #             prettyNum(sd(srcData()$x))),          
-        #             prettyNum(mean(srcData()$y)),          
-        #             prettyNum(sd(srcData()$y))
-        # ),
-        # colnames = FALSE, rownames = FALSE,
-        # striped = TRUE
     })
     
-    
-     
     output$dotPlot <- renderPlot({
         # print(srcData())
         ggplot(srcData(), aes(x, y)) + geom_point(alpha = 0.2) +
             facet_wrap(~cat) +
             theme(legend.position = "none")
+    })
+    
+    output$dotPlotAPI <- renderPlot({
+        if (input$useAPI) {
+          url <- parse_url(input$apiURL)
+          body <- list(x = srcData()$x, y = srcData()$y)
+          url$path <- "plot"
+          resp <- POST(url, body = body, encode = "json") 
+          content(resp)
+        }
     })
    
     randomValue <- function(mean, sd) {
