@@ -7,7 +7,7 @@ library(httr)
 ui <- fluidPage(
     titlePanel("k8s demo app"),
     fluidRow(
-        column(3,
+        column(2,
                tabsetPanel(type = "tabs",
                    tabPanel("Parameters",
                        sliderInput("numPoints", "Number of points", 100, 6000, 1000, 50, 
@@ -27,15 +27,19 @@ ui <- fluidPage(
                    )
                )
         ),
-        column(9,
-               plotOutput("dotPlot"),
+        column(5,
+               h3("Local"),
                tableOutput("summaryTable"),
-               tableOutput("summaryTableAPI")
+               plotOutput("dotPlot")
+        ),
+        column(5,
+               h3("API"),
+               tableOutput("summaryTableAPI"),
+               plotOutput("dotPlotAPI")
         )
     )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   
     output$summaryTable <- renderTable({
@@ -95,7 +99,7 @@ server <- function(input, output) {
      
     output$dotPlot <- renderPlot({
         # print(srcData())
-        ggplot(srcData(), aes(x, y)) + geom_point() +
+        ggplot(srcData(), aes(x, y)) + geom_point(alpha = 0.2) +
             facet_wrap(~cat) +
             theme(legend.position = "none")
     })

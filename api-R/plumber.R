@@ -9,6 +9,8 @@
 
 library(plumber)
 
+DEBUG <- TRUE
+
 #* @apiTitle hourlyCost API
 
 #* Echo back the input
@@ -24,7 +26,7 @@ function(msg = "") {
 #* @param c The third number to add
 #* @param d The fourth number to add
 #* @param e The fifth number to add
-#* @get /sum
+#* @get /sumfive
 function(a, b, c, d, e) {
     print(paste('Called sum with', a,b,c,d,e))
     as.numeric(a) + 
@@ -32,6 +34,30 @@ function(a, b, c, d, e) {
     as.numeric(c) + 
     as.numeric(d) + 
     as.numeric(e)  
+}
+
+#* Return sum of numbers
+#* @post /sum
+function(req, d) {
+    # if (DEBUG) {
+    #     print("Called sum")
+    #     # browser()
+    #     print(req$postBody)
+    #     print(d)
+    # }
+    resp <- sum(as.numeric(d))
+    if (DEBUG) print(resp)
+    resp
+}
+
+
+#* Return length of list numbers
+#* @post /count
+function(req, d) {
+    resp <- length(d)
+    # browser()
+    if (DEBUG) print(resp)
+    resp
 }
 
 #* Return OK
