@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(httr)
+library(base64enc)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -35,7 +36,8 @@ ui <- fluidPage(
         column(5,
                h3("API"),
                tableOutput("summaryTableAPI"),
-               imageOutput("dotPlotAPI")
+               uiOutput("dotPlotAPI")
+               # imageOutput("dotPlotAPI")
         )
     )
 )
@@ -53,7 +55,7 @@ server <- function(input, output) {
    
     apiPOST <- function(url, body) {
         resp <- POST(url, body = body, content_type_json(), encode = "json") 
-        print(resp)
+        # print(resp)
         resp
     } 
     
@@ -74,7 +76,6 @@ server <- function(input, output) {
         if (input$useAPI) {
           url <- parse_url(input$apiURL)
           body = list(d = srcData()$x)
-          print(apiMean(url, body))
           # resp <- POST(build_url(url), body = body, encode = "json", content_type_json(), verbose())
           srcData() %>% 
             group_by(cat) %>% 
@@ -93,13 +94,16 @@ server <- function(input, output) {
             theme(legend.position = "none")
     })
     
-    output$dotPlotAPI <- renderPlot({
+    # output$dotPlotAPI <- renderPlot({
+    output$dotPlotAPI <- renderUI({
         if (input$useAPI) {
           url <- parse_url(input$apiURL)
-          body <- list(x = srcData()$x, y = srcData()$y)
+          body <- list(x = srcData()$x, y = srcData()$y, cat = srcData()$cat)
           url$path <- "plot"
           resp <- POST(url, body = body, encode = "json") 
-          content(resp)
+          # tags$img(src = paste0("data:image/png;base64,",base64enc::content(resp)))
+          tags$img(src = paste0("data:image/png;base64,",
+                                base64encode(resp[["content"]])))
         }
     })
    

@@ -65,19 +65,21 @@ function(req, d) {
 #* Return faceted plot
 #* @png
 #* @post /plot
-function(req, x, y) {
-    # 
-    # d <- data.frame(x = x, y = y)
-    # if (DEBUG) print(paste("ds:",summary(d)))
-    # if (DEBUG) print(x)
-    # if (DEBUG) print(y)
-    # if (DEBUG) print(d)
-    # 
-    # d %>% 
-    #     ggplot(aes(x, y)) + geom_point(alpha = 0.2) +
-    #         # facet_wrap(~cat) +
-    #         theme(legend.position = "none")
-    print(ggplot(data=datasets::women, aes(height)) + geom_histogram())
+function(req, x, y, cat) {
+
+    d <- data.frame(x = x, y = y, cat = cat)
+    if (DEBUG) print(paste("ds:",summary(d)))
+    if (DEBUG) print(x)
+    if (DEBUG) print(y)
+    if (DEBUG) print(d)
+
+    graph <- 
+        d %>%
+        ggplot(aes(x, y)) + geom_point(alpha = 0.2) +
+            facet_wrap(~cat) +
+            theme(legend.position = "none")
+    # print(ggplot(data=datasets::women, aes(height)) + geom_histogram())
+    print(graph)
 }
 
 

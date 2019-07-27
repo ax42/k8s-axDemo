@@ -37,6 +37,7 @@ RUN apt-get update -y \
         littler \
 	r-cran-littler \
 	r-cran-plumber \
+	r-cran-ggplot2 \
         r-base=${R_BASE_VERSION}-* \
 #        r-base-dev=${R_BASE_VERSION}-* \
 #        r-recommended=${R_BASE_VERSION}-* \
