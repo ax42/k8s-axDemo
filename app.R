@@ -13,6 +13,7 @@ ui <- fluidPage(
                    tabPanel("Parameters",
                        sliderInput("numPoints", "Number of points", 100, 6000, 1000, 50, 
                                    animate = animationOptions(100, loop = TRUE)),
+                       checkboxInput("useAPIRandom", label = "Use API for random numbers", value = FALSE),
                        sliderInput("numCats", "Number of categories", 1, 6, 2, 1),
                        sliderInput("xMean", "x-axis mean", -10, 10, 0, .1),
                        sliderInput("xStdDev", "x-axis std dev", 0, 10, 1, .1),
@@ -108,7 +109,13 @@ server <- function(input, output) {
     })
    
     randomValue <- function(mean, sd) {
-        return (rnorm(1, mean, sd))
+      if (input$useAPIRandom) {
+            url <- parse_url(input$apiURL)
+            url$path <- "randomNorm"
+            resp <- GET(build_url(url), query = list(m = mean, sd = sd))
+            return(as.numeric(content(resp)))
+      }
+      else return (rnorm(1, mean, sd))
     } 
     
     srcData <- reactive({

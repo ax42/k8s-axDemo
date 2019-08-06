@@ -82,8 +82,15 @@ function(req, x, y, cat) {
     print(graph)
 }
 
+#* Return random number from normal distribution with specified mean and std dev
+#* @param m Mean of the distribution
+#* @param sd Std Dev of the distribution
+#* @get /randomNorm
+function(m=0, sd=1) {
+    rnorm(1, as.numeric(m), as.numeric(sd))
+}
 
-#* Return OK
+#* Return nodename
 #* @get /nodename
 function() {
     print('Called nodename')
