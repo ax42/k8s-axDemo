@@ -20,7 +20,7 @@ ui <- fluidPage(
                        sliderInput("yStdDev", "y-axis std dev", 0, 10, 2, .1)
                    ),
                    tabPanel("API",
-                        checkboxInput("useAPI", label = "Use API", value = FALSE),
+                        # checkboxInput("useAPI", label = "Use API", value = FALSE),
                         textInput("apiURL", "API endpoint", "http://localhost:8001/"),
                         # textInput("apiURL", "API endpoint", "http://walker:8001/"),
                         textOutput("apiNodename")
@@ -35,9 +35,10 @@ ui <- fluidPage(
         ),
         column(5,
                h3("API"),
+               checkboxInput("useAPITable", label = "Use API", value = FALSE),
                tableOutput("summaryTableAPI"),
+               checkboxInput("useAPIPlot", label = "Use API", value = FALSE),
                uiOutput("dotPlotAPI")
-               # imageOutput("dotPlotAPI")
         )
     )
 )
@@ -73,7 +74,7 @@ server <- function(input, output) {
       return(s/n)
     }
     output$summaryTableAPI <- renderTable({
-        if (input$useAPI) {
+        if (input$useAPITable) {
           url <- parse_url(input$apiURL)
           body = list(d = srcData()$x)
           # resp <- POST(build_url(url), body = body, encode = "json", content_type_json(), verbose())
@@ -96,12 +97,11 @@ server <- function(input, output) {
     
     # output$dotPlotAPI <- renderPlot({
     output$dotPlotAPI <- renderUI({
-        if (input$useAPI) {
+        if (input$useAPIPlot) {
           url <- parse_url(input$apiURL)
           body <- list(x = srcData()$x, y = srcData()$y, cat = srcData()$cat)
           url$path <- "plot"
           resp <- POST(url, body = body, encode = "json") 
-          # tags$img(src = paste0("data:image/png;base64,",base64enc::content(resp)))
           tags$img(src = paste0("data:image/png;base64,",
                                 base64encode(resp[["content"]])))
         }
@@ -120,16 +120,16 @@ server <- function(input, output) {
     })
     
     output$apiNodename <- renderText({
-        if (input$useAPI) {
+        # if (input$useAPITable) {
             url <- parse_url(input$apiURL)
             url$path <- "nodename"
             resp <- GET(build_url(url))
             return(paste("node:", content(resp, "text")))
-        } 
+        # } 
     })
     
     output$apiSum <- renderText({
-        if (input$useAPI) {
+        if (input$useAPITable) {
           url <- parse_url(input$apiURL)
           url$path <- "sum"
           body = list(d = c(1,2,3,4,5))
